@@ -1,0 +1,38 @@
+﻿<!-- Client/Pages/Register.razor -->
+@page "/register"
+@inject HttpClient Http
+@code {
+    private UserRegisterDto user = new UserRegisterDto();
+    private async Task Register()
+    {
+        var response = await Http.PostAsJsonAsync("api/auth/register", user);
+        if (response.IsSuccessStatusCode)
+        {
+            // Registration successful
+        }
+        else
+        {
+            // Handle error
+        }
+    }
+}
+
+<h3>Register</h3>
+<EditForm Model="user" OnValidSubmit="Register">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label>Name:</label>
+        <InputText id="name" @bind-Value="user.Name" />
+    </div>
+    <div>
+        <label>Email:</label>
+        <InputText id="email" @bind-Value="user.Email" />
+    </div>
+    <div>
+        <label>Password:</label>
+        <InputText id="password" type="password" @bind-Value="user.Password" />
+    </div>
+    <button type="submit">Register</button>
+</EditForm>

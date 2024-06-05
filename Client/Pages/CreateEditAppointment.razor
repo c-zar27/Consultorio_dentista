@@ -1,0 +1,59 @@
+﻿<!-- Client/Pages/CreateEditAppointment.razor -->
+@page "/create-appointment"
+@page "/edit-appointment/{Id:int}"
+@inject AppointmentService AppointmentService
+@inject NavigationManager NavigationManager
+
+<h3>@(appointment.Id == 0 ? "Create Appointment" : "Edit Appointment")</h3>
+
+<EditForm Model="appointment" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label>Patient Name:</label>
+        <InputText @bind-Value="appointment.PatientName" />
+    </div>
+    <div>
+        <label>Patient Email:</label>
+        <InputText @bind-Value="appointment.PatientEmail" />
+    </div>
+    <div>
+        <label>Appointment Date:</label>
+        <InputDate @bind-Value="appointment.AppointmentDate" />
+    </div>
+    <div>
+        <label>Notes:</label>
+        <InputTextArea @bind-Value="appointment.Notes" />
+    </div>
+    <button type="submit">@((appointment.Id == 0) ? "Create" : "Update")</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int? Id { get; set; }
+
+    private Appointment appointment = new Appointment();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id.HasValue)
+        {
+            appointment = await AppointmentService.GetAppointment(Id.Value);
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (appointment.Id == 0)
+        {
+            await AppointmentService.CreateAppointment(appointment);
+        }
+        else
+        {
+            await AppointmentService.UpdateAppointment(appointment);
+        }
+
+        NavigationManager.NavigateTo("/appointments");
+    }
+}

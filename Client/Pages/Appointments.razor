@@ -1,0 +1,68 @@
+﻿<!-- Client/Pages/Appointments.razor -->
+@page "/appointments"
+@using BlazorDentista.Client.Services
+@inject AppointmentService AppointmentService
+@inject NavigationManager NavigationManager
+
+<h3>Appointments</h3>
+
+<button @onclick="CreateNewAppointment">Create New Appointment</button>
+
+@if (appointments == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Patient Name</th>
+                <th>Patient Email</th>
+                <th>Appointment Date</th>
+                <th>Notes</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var appointment in appointments)
+            {
+                <tr>
+                    <td>@appointment.PatientName</td>
+                    <td>@appointment.PatientEmail</td>
+                    <td>@appointment.AppointmentDate</td>
+                    <td>@appointment.Notes</td>
+                    <td>
+                        <button @onclick="() => EditAppointment(appointment.Id)">Edit</button>
+                        <button @onclick="() => DeleteAppointment(appointment.Id)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<BlazorDentista.Shared.Appointment> appointments;
+
+    protected override async Task OnInitializedAsync()
+    {
+        appointments = await AppointmentService.GetAppointments();
+    }
+
+    private void CreateNewAppointment()
+    {
+        NavigationManager.NavigateTo("/create-appointment");
+    }
+
+    private void EditAppointment(int id)
+    {
+        NavigationManager.NavigateTo($"/edit-appointment/{id}");
+    }
+
+    private async Task DeleteAppointment(int id)
+    {
+        await AppointmentService.DeleteAppointment(id);
+        appointments = await AppointmentService.GetAppointments();
+    }
+}
